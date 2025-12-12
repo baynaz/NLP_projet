@@ -28,3 +28,5 @@ If you encounter "Cannot open camera" errors:
    ```bash
    ls /dev/video*
    ```
+https://huggingface.co/OpenGVLab/InternVL3_5-1B
+https://huggingface.co/learn/computer-vision-course/unit4/multimodal-models/vlm-intro
