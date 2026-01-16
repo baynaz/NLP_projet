@@ -1,24 +1,43 @@
+import sys
 import os
-import subprocess
-KEY_V = ord('v') # just show camera
-KEY_I = ord('i') # register video like input
 
-def choose_mode(key: str) -> None:
-    match key:
-        case 'v':
-            subprocess.run(["uv", "run", "src/backend/streaming/VideoStream.py"])
-        case 'i':
-            subprocess.run(["uv", "run", "src/backend/streaming/RegisterStream.py"])
-        case _:
-            raise ValueError(f"Unrecognized key: {key}")
+# Astuce pour que Python trouve les fichiers
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from ai_logic import InternVLModel
+from streaming.VideoStream import run_view_mode
+from streaming.RegisterStream import run_register_mode
+
 def main():
-    ask_question_string_before_beginning: str = """
-        Please select a streaming mode by pressing the corresponding key:
-        [v] View only: Display the camera feed.
-        [i] Record: Display and record the camera feed.
-    """
-    key_mode: str = str(input(ask_question_string_before_beginning))
-    choose_mode(key_mode)
+    print("Initialisation du système...")
+    # notre IA
+    global_model = InternVLModel() 
+    
+    while True:
+        ask = """
+        ---------------------------
+        SYSTEME VISION IA PRÊT
+        ---------------------------
+        [v] Voir (View only)
+        [i] Enregistrer (Record)
+        [q] Quitter
+        
+        Choix : """
+        
+        key = input(ask).strip().lower()
+        
+        if key == 'v':
+            # On donne le modèle déjà chargé à la fonction
+            run_view_mode(global_model) 
+            
+        elif key == 'i':
+            run_register_mode(global_model)
+            
+        elif key == 'q':
+            print("Au revoir.")
+            break
+        else:
+            print("Touche inconnue.")
 
 if __name__ == "__main__":
     main()
