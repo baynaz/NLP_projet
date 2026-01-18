@@ -1,145 +1,70 @@
-#!/usr/bin/env python
-
-# http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_gui/py_video_display/py_video_display.html#saving-a-video
-# FFMPEG FOURCC tags: http://ffmpeg.org/doxygen/trunk/isom_8c-source.html
-# FOURCC codecs: http://www.fourcc.org/codecs.php
-# $ ffmpeg --codecs
-# http://www.ftyps.com/
-
-from __future__ import print_function
 import cv2
-import time
+import threading
+import datetime
 import os
-from pathlib import Path
+import textwrap # <--- NOUVEAU
+from PIL import Image
 
-# ---------------------------------------------------------------------
+state = {'text': "Appuyez sur ESPACE", 'busy': False}
 
-# keys 
-KEY_R = ord('r') # start recording
-KEY_S = ord('s') # stop recording
-KEY_Q = ord('q') # quit
-KEY_ESC = 27     # quit 
+def ai_worker(model, frame):
+    try:
+        pil_img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+        res = model.analyze_frame(pil_img)
+        state['text'] = res
+    except:
+        state['text'] = "Erreur"
+    finally:
+        state['busy'] = False
 
-# font
-FONT = cv2.FONT_HERSHEY_PLAIN
-
-# video file size
-VIDEO_FILE_SIZE = 10 * 1024 * 1024 # split to 10 MB files
-
-# ---------------------------------------------------------------------
-
-# states
-running = True 
-recording = False
-create_new_file = True
-
-# window name
-window_name = time.strftime("%Y.%m.%d  %H.%M.%S", time.localtime())
-
-# ---------------------------------------------------------------------
-
-# create VideoCapture
-vcap = cv2.VideoCapture(0) # 0=camera
- 
-# check if video capturing has been initialized already
-if not vcap.isOpened(): 
-    print("ERROR INITIALIZING VIDEO CAPTURE")
-    exit()
-else:
-    print("OK INITIALIZING VIDEO CAPTURE")
- 
-    # get vcap property 
-    width = int(vcap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(vcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    #fps = float(vcap.get(cv2.CAP_PROP_FPS))
-    fps = 15.0 # use different value to get slowmotion or fastmotion effect
-    fps = 30.0 # use different value to get slowmotion or fastmotion effect
+def run_register_mode(model):
+    print("Préparation enregistrement...")
     
-    print('VCAP width :', width)
-    print('VCAP height:', height)
-    print('VCAP fps   :', fps)
+    cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    
+    save_dir = os.path.join(os.path.dirname(__file__), "records")
+    os.makedirs(save_dir, exist_ok=True)
+    filename = os.path.join(save_dir, f"video_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.avi")
+    
+    # On récupère la vraie taille de la camera
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    out = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc(*'XVID'), 20.0, (width, height))
+    
+    print(f"Enregistrement : {filename}")
 
+    window_name = 'Mode REC'
+    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(window_name, 1024, 768)
 
-video_dir = Path(__file__).parent / "VideoRecorded"
-video_dir.mkdir(parents=True, exist_ok=True)
- 
-while running:
-    # grab, decode and return the next video frame (and "return" status)
-    ret, frame = vcap.read()
- 
-    # write the next video frame
-    if recording:
-        if create_new_file:
-            # VideoWriter constructors
-            #.mp4 = codec id 2
-            filename = video_dir / (time.strftime("%Y.%m.%d-%H.%M.%S", time.localtime()) + ".avi")
+    while True:
+        ret, frame = cap.read()
+        if not ret: continue
+        
+        key = cv2.waitKey(1) & 0xFF
 
-            #fourcc = cv2.VideoWriter_fourcc(*'I420') # .avi
-            #fourcc = cv2.VideoWriter_fourcc(*'MP4V') # .avi
-            fourcc = cv2.VideoWriter_fourcc(*'MP42') # .avi
-            #fourcc = cv2.VideoWriter_fourcc(*'AVC1') # error libx264
-            #fourcc = cv2.VideoWriter_fourcc(*'H264') # error libx264
-            #fourcc = cv2.VideoWriter_fourcc(*'WRAW') # error --- no information ---
-            #fourcc = cv2.VideoWriter_fourcc(*'MPEG') # .avi 30fps
-            #fourcc = cv2.VideoWriter_fourcc(*'MJPG') # .avi
-            #fourcc = cv2.VideoWriter_fourcc(*'XVID') # .avi
-            #fourcc = cv2.VideoWriter_fourcc(*'H265') # error 
-            
-            fout = cv2.VideoWriter(filename, fourcc, fps, (width, height))
-            create_new_file = False
- 
-            # check if video writer has been successfully initialized
-            if not fout.isOpened():
-                print("ERROR INITIALIZING VIDEO WRITER")
-                break
-            else:
-                print("OK INITIALIZING VIDEO WRITER")
- 
-        # write frame to file         
-        if fout.isOpened():
-            fout.write(frame)
- 
-        # check file size
-        if Path(filename).stat().st_size >= VIDEO_FILE_SIZE:
-            fout.release() # close current file
-            create_new_file = True # time to create new file in next loop
- 
-        # add REC to frame
-        cv2.putText(frame, "REC", (40,40), FONT, 3 , (0,0,255), 2)
-        cv2.circle(frame, (20,20), 10 , (0,0,255), -1)
+        if key == 32 and not state['busy']:
+            state['busy'] = True
+            state['text'] = "Analyse..."
+            threading.Thread(target=ai_worker, args=(model, frame.copy())).start()
 
-    # displays an image in the specified window (without menu)
-    #cv2.imshow(window_name, frame)         
- 
-    # add instruction to frame
-    cv2.putText(frame,"R - START RECORDING",(width - 200,20), FONT, 1 ,(255,255,255))
-    cv2.putText(frame,"S - STOP RECORDING",(width - 200,40), FONT, 1 ,(255,255,255))
-    cv2.putText(frame,"Q - QUIT",(width - 200,60), FONT, 1 ,(255,255,255))
-    cv2.putText(frame,"ESC - QUIT",(width - 200,80), FONT, 1 ,(255,255,255))
- 
-    # displays an image in the specified window (with menu)
-    #cv2.namedWindow(window_name)
-    cv2.imshow(window_name+' (with menu)', frame)         
- 
-    # get key (get only lower 8-bits to work with chars)
-    key = cv2.waitKey(1) & 0xFF
+        lines = textwrap.wrap(state['text'], width=60)
+        box_height = 40 + (len(lines) * 30)
+        
+        cv2.rectangle(frame, (0, 0), (width, box_height), (0,0,0), -1)
+        y = 30
+        for line in lines:
+            # Police un peu plus grosse (0.8) et plus épaisse (2) pour bien lire
+            cv2.putText(frame, line, (10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255), 2)
+            y += 30
 
-    # check what to do
-    if key == KEY_R and not recording:
-        print("START RECORDING")
-        recording = True
-        create_new_file = True
-    elif key == KEY_S and recording:
-        print("STOP RECORDING")
-        recording = False
-        create_new_file = False
-        fout.release()
-    #elif key in (KEY_Q, KEY_ESC):
-    elif key == KEY_Q or key == KEY_ESC:
-        print("EXIT")
-        running = False
- 
-#Release everything 
-#fout.release()
-vcap.release()
-cv2.destroyAllWindows()
+        out.write(frame)
+        cv2.imshow(window_name, frame)
+        if key == ord('q'): break
+
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()
