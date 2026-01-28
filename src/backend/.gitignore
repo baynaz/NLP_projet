@@ -1,2 +1,9 @@
 .venv
 streaming/VideoRecorded
+__pycache__/
+
+# Inference results and outputs
+results/
+segments_output/
+*.avi
+*.mp4
