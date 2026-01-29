@@ -1,11 +1,11 @@
 import sys
 import os
+import streamlit as st
 
-# Force X11 backend for OpenCV BEFORE any other imports
+# Force X11 backend for OpenCV
 os.environ['QT_QPA_PLATFORM'] = 'xcb'
 os.environ['OPENCV_VIDEOIO_PRIORITY_MSMF'] = '0'
 
-# Astuce pour que Python trouve les fichiers
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from ai_logic import InternVLModel
@@ -13,36 +13,47 @@ from streaming.VideoStream import run_view_mode
 from streaming.RegisterStream import run_register_mode
 
 
+# =============================
+# MODELE (1 seule fois)
+# =============================
+@st.cache_resource
+def load_model():
+    return InternVLModel(streaming_mode=True)
+
+
+# =============================
+# STREAMLIT UI
+# =============================
 def main():
-    print("Initialisation du système...")
-    # notre IA avec mode streaming activé pour les performances
-    global_model = InternVLModel(streaming_mode=True)
+    st.set_page_config(
+        page_title="Système Vision IA",
+        layout="centered"
+    )
 
-    while True:
-        ask = """
-        ---------------------------
-        SYSTEME VISION IA PRÊT
-        ---------------------------
-        [v] Voir (View only) - Nécessite une caméra
-        [i] Enregistrer (Record) - Nécessite une caméra
-        [q] Quitter
-        
-        Choix : """
+    st.title("🎥 Système Vision IA (Caméra PC)")
+    st.write("Contrôle via Streamlit — Caméra via OpenCV")
 
-        key = input(ask).strip().lower()
+    model = load_model()
 
-        if key == "v":
-            # On donne le modèle déjà chargé à la fonction
-            run_view_mode(global_model)
+    st.warning(
+        "La caméra s’ouvrira dans une fenêtre OpenCV séparée.\n"
+        "Fermez-la pour revenir à Streamlit."
+    )
 
-        elif key == "i":
-            run_register_mode(global_model)
+    col1, col2 = st.columns(2)
 
-        elif key == "q":
-            print("Au revoir.")
-            break
-        else:
-            print("Touche inconnue.")
+    with col1:
+        if st.button("👁️ Mode View (Caméra)"):
+            st.info("Ouverture caméra (View)...")
+            run_view_mode(model)
+
+    with col2:
+        if st.button("📝 Mode Enregistrement (Caméra)"):
+            st.info("Ouverture caméra (Record)...")
+            run_register_mode(model)
+
+    st.markdown("---")
+    st.caption("Appuyez sur Q dans la fenêtre OpenCV pour fermer la caméra.")
 
 
 if __name__ == "__main__":
