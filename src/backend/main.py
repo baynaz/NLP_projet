@@ -30,7 +30,7 @@ def main():
         layout="centered"
     )
 
-    st.title("🎥 Système Vision IA (Caméra PC)")
+    st.title("Vision IA - INternVL")
     st.write("Contrôle via Streamlit — Caméra via OpenCV")
 
     model = load_model()
@@ -43,12 +43,12 @@ def main():
     col1, col2 = st.columns(2)
 
     with col1:
-        if st.button("👁️ Mode View (Caméra)"):
+        if st.button("Mode View "):
             st.info("Ouverture caméra (View)...")
             run_view_mode(model)
 
     with col2:
-        if st.button("📝 Mode Enregistrement (Caméra)"):
+        if st.button("Mode Enregistrement "):
             st.info("Ouverture caméra (Record)...")
             run_register_mode(model)
 
