@@ -10,7 +10,7 @@ from PIL import Image
 # Add parent directory to path to allow imports from backend/
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from CutScenes import split_video
+from .CutScenes import split_video
 from ai_logic import InternVLModel
 
 
