@@ -219,12 +219,17 @@ cd src/backend
 # Install all dependencies from pyproject.toml
 uv sync
 ```
-#### Exemple result
+#### Exemple video
 
 ![video](image.png)
 
 #### Result
 ![video_result](result_image.png)
+
+#### Exemple result video stream direct
+![stream](capge.png)
+
+![stream_result](capg_result.png)
 **Dependencies installed**:
 - `transformers` (4.52.1): Hugging Face model loading
 - `torch` (2.10.0): Deep learning framework
