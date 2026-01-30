@@ -5,12 +5,20 @@ import os
 import sys
 from transformers import AutoTokenizer
 
-token = st.secrets["HF_TOKEN"]
-
-tokenizer = AutoTokenizer.from_pretrained(
-    "OpenGVLab/InternVL3_5-1B",
-    use_auth_token=token
-)
+# Try to get HF token if available (for remote deployment)
+# If not available, continue without it (for local usage)
+try:
+    token = st.secrets["HF_TOKEN"]
+    tokenizer = AutoTokenizer.from_pretrained(
+        "OpenGVLab/InternVL3_5-1B",
+        token=token
+    )
+except (KeyError, FileNotFoundError):
+    # No token available - use default behavior for local deployment
+    token = None
+    tokenizer = AutoTokenizer.from_pretrained(
+        "OpenGVLab/InternVL3_5-1B"
+    )
 
 # Permet d'importer backend/
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
