@@ -421,13 +421,9 @@ These technical metrics would enable performance optimization and help identify 
 **Misuse**: Could be used for unauthorized surveillance  
 **Hallucination**: Model may generate plausible but incorrect descriptions
 
-**Mitigation strategies**: User warnings, watermarking, audit logs, regular bias testing
-
 ---
 
 ## Assignment Requirements
-
-This project fulfills all the requirements of the NLP course assignment (Sessions 5, 6, and 7).
 
 ### Core Requirements ("Tronc Commun")
 
