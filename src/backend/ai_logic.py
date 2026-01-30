@@ -4,8 +4,6 @@ import torch
 import os
 from transformers import AutoTokenizer
 
-HF_TOKEN = "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"
-
 token = os.getenv("HF_TOKEN")
 
 tokenizer = AutoTokenizer.from_pretrained(
