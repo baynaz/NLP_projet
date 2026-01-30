@@ -1,5 +1,8 @@
 # NLP Project: Multimodal Video Analysis with Vision-Language Models
 
+## Disclaimer
+The project is adapted for linux environment please USE LINUX.
+---
 **Advanced NLP Technique**: Multimodality (Vision-Language Models)  
 **Model**: InternVL3.5-1B  
 **Application**: Real-time video and image analysis with natural language descriptions
@@ -216,7 +219,12 @@ cd src/backend
 # Install all dependencies from pyproject.toml
 uv sync
 ```
+#### Exemple result
 
+![video](image.png)
+
+#### Result
+![video_result](image-1.png)
 **Dependencies installed**:
 - `transformers` (4.52.1): Hugging Face model loading
 - `torch` (2.10.0): Deep learning framework

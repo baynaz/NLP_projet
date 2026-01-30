@@ -39,7 +39,7 @@ st.title("Analyse d’images et vidéos")
 def load_model():
     return InternVLModel(streaming_mode=True)
 
-st.sidebar.write("⚡ Chargement du modèle IA...")
+st.sidebar.write("Chargement du modèle IA...")
 model = load_model()
 st.sidebar.write("Modèle prêt")
 
