@@ -6,8 +6,7 @@ from transformers import AutoTokenizer
 
 
 tokenizer = AutoTokenizer.from_pretrained(
-    "OpenGVLab/InternVL3_5-1B",
-    token=token,
+    "OpenGVLab/InternVL3_5-1B"
 )
 
 
