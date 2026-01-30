@@ -271,12 +271,12 @@ The application opens at `http://localhost:8501`
 
 **Analyze a video**:
 ```bash
-python -m streaming.inference_multi --video path/to/video.mp4 --segments 8
+uv run python -m streaming.inference_multi --video path/to/video.mp4 --segments 8
 ```
 
 **Real-time webcam (OpenCV)**:
 ```bash
-python main.py
+uv run python main.py
 ```
 
 ### Option 3: Python API
