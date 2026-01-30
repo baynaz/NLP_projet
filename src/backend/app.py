@@ -3,7 +3,14 @@ from PIL import Image
 import tempfile
 import os
 import sys
+from transformers import AutoTokenizer
 
+token = st.secrets["HF_TOKEN"]
+
+tokenizer = AutoTokenizer.from_pretrained(
+    "OpenGVLab/InternVL3_5-1B",
+    use_auth_token=token
+)
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -32,13 +39,13 @@ st.sidebar.write("Modèle prêt")
 
 mode = st.radio(
     "Que voulez-vous analyser ?",
-    ("📷 Image", "📹 Vidéo")
+    ("Image", "Vidéo")
 )
 
 
 # MODE IMAGE
-if mode == "📷 Image":
-    st.subheader("📸 Capture d'image via webcam")
+if mode == "Image":
+    st.subheader("Capture d'image via webcam")
 
     img_file = st.camera_input("Prends une photo")
 
@@ -58,8 +65,8 @@ if mode == "📷 Image":
 
 # MODE VIDÉO
 
-elif mode == "📹 Vidéo":
-    st.subheader("📹 Uploader une vidéo")
+elif mode == "Vidéo":
+    st.subheader("Uploader une vidéo")
 
     uploaded_video = st.file_uploader(
         "Choisissez une vidéo (mp4, avi, mov)",
