@@ -224,7 +224,7 @@ uv sync
 ![video](image.png)
 
 #### Result
-![video_result](image-1.png)
+![video_result](result_image.png)
 **Dependencies installed**:
 - `transformers` (4.52.1): Hugging Face model loading
 - `torch` (2.10.0): Deep learning framework
