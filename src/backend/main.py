@@ -13,17 +13,13 @@ from streaming.VideoStream import run_view_mode
 from streaming.RegisterStream import run_register_mode
 
 
-# =============================
 # MODELE (1 seule fois)
-# =============================
 @st.cache_resource
 def load_model():
     return InternVLModel(streaming_mode=True)
 
 
-# =============================
 # STREAMLIT UI
-# =============================
 def main():
     st.set_page_config(
         page_title="Système Vision IA",

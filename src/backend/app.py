@@ -4,9 +4,7 @@ import tempfile
 import os
 import sys
 
-# ------------------------------------------------------------------
 # Permet d'importer backend/
-# ------------------------------------------------------------------
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from backend.ai_logic import InternVLModel
@@ -16,36 +14,29 @@ from backend.streaming.inference_multi import (
     format_results
 )
 
-# ------------------------------------------------------------------
 # Configuration Streamlit
-# ------------------------------------------------------------------
 st.set_page_config(page_title="InternVL – Image & Video Analyzer", layout="centered")
 st.title("Analyse d’images et vidéos")
 
-# ------------------------------------------------------------------
 # Chargement du modèle IA (1 seule fois)
-# ------------------------------------------------------------------
 @st.cache_resource
 def load_model():
     return InternVLModel(streaming_mode=True)
 
 st.sidebar.write("⚡ Chargement du modèle IA...")
 model = load_model()
-st.sidebar.write("✅ Modèle prêt")
+st.sidebar.write("Modèle prêt")
 
-# ------------------------------------------------------------------
-# Choix global
-# ------------------------------------------------------------------
+# Choix global 
 mode = st.radio(
     "Que voulez-vous analyser ?",
-    ("📷 Image", "📹 Vidéo")
+    ("Image-en-direct", "Import-video")
 )
 
+# MODE IMAGE Direct
 # ==================================================================
-# MODE IMAGE
-# ==================================================================
-if mode == "📷 Image":
-    st.subheader("📸 Capture d'image via webcam")
+if mode == "Image-en-direct":
+    st.subheader("Capture d'image via webcam")
 
     img_file = st.camera_input("Prends une photo")
 
@@ -53,20 +44,19 @@ if mode == "📷 Image":
         image = Image.open(img_file).convert("RGB")
         st.image(image, caption="Image capturée", use_container_width=True)
 
-        with st.spinner("🧠 Analyse IA en cours..."):
+        with st.spinner("Analyse IA en cours..."):
             response = model.analyze_frame(
                 image,
                 max_new_tokens=40
             )
 
-        st.markdown("### 🧠 Résultat IA")
+        st.markdown("### Résultat IA")
         st.write(response)
 
-# ==================================================================
+
 # MODE VIDÉO
-# ==================================================================
-elif mode == "📹 Vidéo":
-    st.subheader("📹 Uploader une vidéo")
+elif mode == "Import-video":
+    st.subheader("Uploader une vidéo")
 
     uploaded_video = st.file_uploader(
         "Choisissez une vidéo (mp4, avi, mov)",
@@ -74,21 +64,17 @@ elif mode == "📹 Vidéo":
     )
 
     if uploaded_video is not None:
-        # --------------------------------------------------------------
         # Sauvegarde temporaire
-        # --------------------------------------------------------------
         temp_video = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
         temp_video.write(uploaded_video.read())
         temp_video.close()
 
-        st.success("✅ Vidéo uploadée avec succès")
+        st.success("Vidéo uploadée avec succès")
         st.video(temp_video.name)
 
-        # --------------------------------------------------------------
         # Choix du type d’analyse
-        # --------------------------------------------------------------
         analysis_mode = st.radio(
-            "🧠 Type d'analyse",
+            "Type d'analyse",
             (
                 "Description globale de la vidéo",
                 "Analyse segment par segment"
@@ -103,11 +89,9 @@ elif mode == "📹 Vidéo":
             value=4
         )
 
-        # --------------------------------------------------------------
         # ANALYSE GLOBALE
-        # --------------------------------------------------------------
         if analysis_mode == "Description globale de la vidéo":
-            st.info("🧠 Analyse globale de la vidéo")
+            st.info("Analyse globale de la vidéo")
 
             with st.spinner("Analyse en cours..."):
                 result = analyze_full_video(
@@ -116,14 +100,12 @@ elif mode == "📹 Vidéo":
                     num_segments=num_segments
                 )
 
-            st.subheader("📝 Description complète")
+            st.subheader("Description complète")
             st.write(result)
 
-        # --------------------------------------------------------------
         # ANALYSE PAR SEGMENTS
-        # --------------------------------------------------------------
         elif analysis_mode == "Analyse segment par segment":
-            st.info("🧩 Analyse segmentée de la vidéo")
+            st.info("Analyse segmentée de la vidéo")
 
             with st.spinner("Analyse en cours..."):
                 results = process_video_with_inference(
@@ -133,5 +115,5 @@ elif mode == "📹 Vidéo":
                     cleanup_segments=True
                 )
 
-            st.subheader("🧩 Résultats par segment")
+            st.subheader("Résultats par segment")
             st.markdown(format_results(results, output_format="markdown"))
