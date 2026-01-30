@@ -4,7 +4,6 @@ import torch
 import os
 from transformers import AutoTokenizer
 
-token = os.getenv("HF_TOKEN")
 
 tokenizer = AutoTokenizer.from_pretrained(
     "OpenGVLab/InternVL3_5-1B",
