@@ -140,6 +140,7 @@ def load_video(video_path, bound=None, input_size=448, max_num=1, num_segments=3
 class InternVLModel:
     def __init__(self, streaming_mode=False):
         self.path = "OpenGVLab/InternVL3_5-1B"
+        self.revision = "main"  # Pin to specific revision to avoid auto-updates
         self.streaming_mode = streaming_mode
         
         # Detect device
@@ -153,7 +154,7 @@ class InternVLModel:
             print("Chargement du modèle IA sur CPU")
 
         self.tokenizer = AutoTokenizer.from_pretrained(
-            self.path, trust_remote_code=True, use_fast=False
+            self.path, trust_remote_code=True, use_fast=False, revision=self.revision
         )
         
         # Load model - disable all memory optimization features that cause meta tensor issues
@@ -161,6 +162,7 @@ class InternVLModel:
             "trust_remote_code": True,
             "use_flash_attn": False,
             "low_cpu_mem_usage": False,
+            "revision": self.revision,
         }
         
         if torch.cuda.is_available():
