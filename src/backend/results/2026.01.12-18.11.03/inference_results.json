@@ -1,0 +1,34 @@
+[
+  {
+    "segment_number": 1,
+    "segment_file": "segments_output/2026.01.12-18.11.03_segment_1.mp4",
+    "time_range": "0:00:00 - 0:00:00",
+    "start_seconds": 0.0,
+    "end_seconds": 0.85,
+    "inference_text": "The man C is talking to the camera."
+  },
+  {
+    "segment_number": 2,
+    "segment_file": "segments_output/2026.01.12-18.11.03_segment_2.mp4",
+    "time_range": "0:00:00 - 0:00:01",
+    "start_seconds": 0.85,
+    "end_seconds": 1.7,
+    "inference_text": "The man is talking to the camera. He is making a peace sign with his right hand."
+  },
+  {
+    "segment_number": 3,
+    "segment_file": "segments_output/2026.01.12-18.11.03_segment_3.mp4",
+    "time_range": "0:00:01 - 0:00:02",
+    "start_seconds": 1.7,
+    "end_seconds": 2.55,
+    "inference_text": "The camera wearer puts his hands on the table."
+  },
+  {
+    "segment_number": 4,
+    "segment_file": "segments_output/2026.01.12-18.11.03_segment_4.mp4",
+    "time_range": "0:00:02 - 0:00:03",
+    "start_seconds": 2.55,
+    "end_seconds": 3.4,
+    "inference_text": "The man C is talking to the camera. He is wearing a black shirt and a necklace. He is making a peace sign with his right hand. He is also wearing glasses. He is sitting in a room with a bookshelf in the background. There is a window behind him. He is also holding a cell phone in his left hand."
+  }
+]
