@@ -1,6 +1,19 @@
 import numpy as np
 import torch
 
+import os
+from transformers import AutoTokenizer
+
+HF_TOKEN = "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"
+
+token = os.getenv("HF_TOKEN")
+
+tokenizer = AutoTokenizer.from_pretrained(
+    "OpenGVLab/InternVL3_5-1B",
+    token=token,
+)
+
+
 # Patch torch.linspace to avoid meta tensor issues during model init
 _original_linspace = torch.linspace
 def _patched_linspace(*args, **kwargs):

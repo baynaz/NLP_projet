@@ -3,12 +3,20 @@ from PIL import Image
 import tempfile
 import os
 import sys
+from transformers import AutoTokenizer
+
+token = st.secrets["HF_TOKEN"]
+
+tokenizer = AutoTokenizer.from_pretrained(
+    "OpenGVLab/InternVL3_5-1B",
+    use_auth_token=token
+)
 
 # Permet d'importer backend/
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from backend.ai_logic import InternVLModel
-from backend.streaming.inference_multi import (
+from ai_logic import InternVLModel
+from streaming.inference_multi import (
     process_video_with_inference,
     analyze_full_video,
     format_results
